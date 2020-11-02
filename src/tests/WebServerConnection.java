@@ -34,17 +34,17 @@ public class WebServerConnection {
 
 	    try
 	    {
-	      // create the HttpURLConnection
+	      
 	      url = new URL(desiredUrl);
 	      HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 	      
-	      // just want to do an HTTP GET here
+	     
 	      connection.setRequestMethod("GET");
 	   
 	      connection.setReadTimeout(15*1000);
 	      connection.connect();
 
-	      // read the output from the server
+	      
 	      reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 	      stringBuilder = new StringBuilder();
 
