@@ -8,22 +8,70 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 public class WebServerConnection {
+	private String url_name;
+	private String method;
+	public WebServerConnection()
+	{
+		 url_name="http://localhost:10008";
+		 method="GET";
+	}
+	
+	public WebServerConnection(String name)
+	{
+		 url_name=name;
+		 method="GET";
+	}
+	
+	public WebServerConnection(String name, String method)
+	{
+		 url_name=name;
+		 this.method=method;
+	}
+	
 	protected int responseCode() {
 		 try {
-		    URL myUrl = new URL("http://localhost:10008");
+		    URL myUrl = new URL(url_name);
+			
 		    HttpURLConnection connection = (HttpURLConnection)myUrl.openConnection();
-			connection.setRequestMethod("GET");
+			connection.setRequestMethod(method);
 		    connection.connect();
 		    return connection.getResponseCode();
 		} catch (ProtocolException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return 0;
 	}
+	
+	protected String contentType()
+	{
+		return hederField(3);
+	}
+	
+	protected String fileLength()
+	{
+		return hederField(4);
+	}
+	
+	private String hederField(int n) { // extrage campul n din heder
+		 try {
+			    URL myUrl = new URL(url_name);
+
+			    HttpURLConnection connection = (HttpURLConnection)myUrl.openConnection();
+				connection.setRequestMethod(method);
+			    connection.connect();
+			    return connection.getHeaderField(n);
+			} catch (ProtocolException e) {
+
+				e.printStackTrace();
+			} catch (IOException e) {
+
+				e.printStackTrace();
+			}
+			return "0";	
+	}
+	
 	
 	  protected String httpUrlConnection(String desiredUrl)
 	  throws Exception
