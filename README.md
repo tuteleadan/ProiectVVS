@@ -9,4 +9,4 @@ In folderul src se gasesc:
 
 In folderul ProiectVVS se gasesc fiserele html, css, txt si resurse(imagini,gif) utilizate in realizarea site-ului.
 
-In folderul Screenshots se gasesc capturile de la teste.
+In folderul Screenshots se gasesc capturile de la teste si pagina home a serverului.
