@@ -120,7 +120,7 @@ public class WebServerTest {
 	
 	
 	@Test 
-	public void testResponse_mentenance() {  
+	public void testResponse_maintenance() {  
 		wbcon=new WebServerConnection();
 		
 		int code=wbcon.responseCode();
