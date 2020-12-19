@@ -53,10 +53,8 @@ public class WebServer extends Thread {
 		byte[] fileData=null;
 		int fileLength=0;
 		try {
-			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),
-					true);
-			BufferedReader in = new BufferedReader(new InputStreamReader(
-					clientSocket.getInputStream()));
+			PrintWriter out = new PrintWriter(clientSocket.getOutputStream(),true);
+			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 			String inputLine=in.readLine();
 
 			BufferedOutputStream dataOut = new BufferedOutputStream(clientSocket.getOutputStream());
@@ -65,63 +63,81 @@ public class WebServer extends Thread {
 			StringTokenizer parse = new StringTokenizer(inputLine);
 			String method = parse.nextToken().toUpperCase(); // we get the HTTP method of the client
 			fileRequested = parse.nextToken().toLowerCase();
+			
 			System.out.println("fileRequested: "+fileRequested );
 			
 			while ((inputLine = in.readLine()) != null) {
 				System.out.println("Server: " + inputLine);
-				//out.println("<p>"+inputLine+"</p>");
-				//out.flush();
+
 				if (inputLine.trim().equals(""))
 					break;
 			}
+			
 			if(stare==ServerStatus.Running) 
 			{
 
 			if (method.equals("GET")) {
+
 				if (fileRequested.endsWith("/")) {
 					fileRequested += DEFAULT_FILE;
 				}
-				
+						
 				File file = new File(WEB_ROOT, fileRequested);
-				String content = getContentType(fileRequested);
-				System.out.println("WEB_ROOT+file: "+file);
-				try {
+				if((fileLength = (int) file.length())==0)
+				{
+					fileRequested=fileRequested.replaceAll("%20", " ");
+					file = new File(WEB_ROOT, fileRequested);
 					fileLength = (int) file.length();
-					fileData = readFileData(file, fileLength);
-				
+				}
+				String content = getContentType(fileRequested);
+				System.out.println("WEB_ROOT+file: "+file+"         content: "+content);
+				try {
+					int n;
+					if((n=fileRequested.indexOf('?'))<0)
+						fileData = readFileData(file, fileLength);
+
+					else
+					{
+						String t="Input text box: "+fileRequested.substring(n+1);
+						t=t.replaceAll("\\+", " ");
+						fileData=t.getBytes("utf-8");
+						fileLength=fileData.length;
+					}
+					System.out.println("readFileData - pass");
 				//  send HTTP Headers with data to client
 				out.println("HTTP/1.1 200 OK r n");
 				out.println("status: \"200\"");
 				out.println("Server: Java HTTP Server");
 				out.println("Content-type: " + content);
 				out.println("Content-length: " + fileLength);
-				out.println(); // blank line between headers and content, very important !
-				out.flush(); // flush character output stream buffer
+				out.println();  // blank line between headers and content
+				out.flush(); 
 				
 				dataOut.write(fileData, 0, fileLength);
 				dataOut.flush();
 				}catch(FileNotFoundException fnfe) {
-					System.err.println("Fisierul nu a fost gasit"+file);
+					System.err.println("Fisierul nu a fost gasit "+file);
 					out.println("HTTP/1.1 404 File Not Found");
 					out.println("status: \"404\"");
-					out.println(); // blank line between headers and content, very important !
-					out.flush(); // flush character output stream buffer
+					out.println(); 
+					out.flush(); 
 			}
 			}	
-			else{
+			else
+			{
 				System.err.println("Metoda nu este implementata");
 				out.println("HTTP/1.1 501 Not Implemented");
 				out.println("status: \"501\"");
-				out.println(); // blank line between headers and content, very important !
-				out.flush(); // flush character output stream buffer
+				out.println(); 
+				out.flush(); 
 			}
 			}else {
 				out.println("HTTP/1.1 503 Service Unavailable");
 				out.println("Server: Java HTTP Server");
 				out.println("Status: \"503\"");
-				out.println(); // blank line between headers and content, very important !
+				out.println(); 
 				out.println("<!DOCTYPE html><html><p> Server is in Maintenance</p></html>");
-				out.flush(); // flush character output stream buffer
+				out.flush();
 				
 			}
 			
@@ -134,10 +150,13 @@ public class WebServer extends Thread {
 		}
 	}
 
-	// return supported MIME Types
+	// return supported Types
 	private String getContentType(String fileRequested) {
 		if (fileRequested.endsWith(".htm")  ||  fileRequested.endsWith(".html"))
 			return "text/html";
+		else
+			if(fileRequested.endsWith(".css"))
+				return "text/css";
 		else
 			return "text/plain";
 	}
